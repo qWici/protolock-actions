@@ -1,0 +1,27 @@
+{
+  "name": "protolock-actions",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "chmod +x ./build.sh && ./build.sh"
+  },
+  "files": [
+    "index.d.ts",
+    "index.js",
+    "index.ts",
+    "dist",
+    "proto"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.8",
+    "@nestjs/microservices": "^10.3.8",
+    "protobufjs": "^7.3.0",
+    "rxjs": "^7.8.1",
+    "ts-proto": "^1.176.0",
+    "typescript": "5.1.6"
+  }
+}

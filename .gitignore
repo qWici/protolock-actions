@@ -1,0 +1,5 @@
+.idea
+ts-proto
+dist
+node_modules
+index.ts
