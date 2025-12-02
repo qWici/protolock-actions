@@ -4,6 +4,7 @@ package grpc.health.v1;
 
 message HealthCheckRequest {
   string service = 1;
+  string status = 2;
 }
 
 message HealthCheckResponse {
