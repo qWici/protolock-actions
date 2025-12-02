@@ -18,16 +18,19 @@ jobs:
           ref: ${{ github.head_ref }}
 
       - name: Install Protolock
-        run: |
-          curl -sSL https://github.com/nilslice/protolock/releases/download/v0.17.0/protolock_0.17.0_linux_amd64.tar.gz \
-          | tar -xz
+        run: |          
+          curl -sSL https://github.com/nilslice/protolock/releases/download/v0.17.0/protolock.20231219T195034Z.linux-amd64.tgz \
+            -o protolock.tgz
+          
+          tar -xzf protolock.tgz
+          chmod +x protolock
           sudo mv protolock /usr/local/bin/
 
       - name: Check Protolock status
         id: protolock
         run: |
           set +e
-          protolock status
+          protolock status --protoroot=./proto
           echo "exit_code=$?" >> $GITHUB_OUTPUT
           set -e
 
@@ -35,21 +38,21 @@ jobs:
         if: steps.protolock.outputs.exit_code == '0'
         run: |
           echo "Protolock status OK — generating new lockfile"
-          protolock commit
+          protolock commit --protoroot=./proto
 
-      - name: Commit updated protolock.json to PR branch
+      - name: Commit updated proto.lock to PR branch
         if: steps.protolock.outputs.exit_code == '0'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          if git diff --quiet protolock.json; then
-            echo "No changes in protolock.json — nothing to commit."
+          if git diff --quiet proto.lock; then
+            echo "No changes in proto.lock — nothing to commit."
             exit 0
           fi
 
-          git add protolock.json
-          git commit -m "chore: update protolock.json"
+          git add proto.lock
+          git commit -m "chore: update proto.lock"
           git push origin HEAD:${{ github.head_ref }}
 
       - name: Fail if breaking changes found
