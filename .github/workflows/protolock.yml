@@ -18,9 +18,12 @@ jobs:
           ref: ${{ github.head_ref }}
 
       - name: Install Protolock
-        run: |
-          curl -sSL https://github.com/nilslice/protolock/releases/download/v0.17.0/protolock_0.17.0_linux_amd64.tar.gz \
-          | tar -xz
+        run: |          
+          curl -sSL https://github.com/nilslice/protolock/releases/download/v0.17.0/protolock.20231219T195034Z.linux-amd64.tgz \
+            -o protolock.tgz
+          
+          tar -xzf protolock.tgz
+          chmod +x protolock
           sudo mv protolock /usr/local/bin/
 
       - name: Check Protolock status
