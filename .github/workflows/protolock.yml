@@ -1,0 +1,59 @@
+name: Protolock Check and Auto-update
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  protolock:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Install Protolock
+        run: |
+          curl -sSL https://github.com/nilslice/protolock/releases/download/v0.17.0/protolock_0.17.0_linux_amd64.tar.gz \
+          | tar -xz
+          sudo mv protolock /usr/local/bin/
+
+      - name: Check Protolock status
+        id: protolock
+        run: |
+          set +e
+          protolock status
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          set -e
+
+      - name: Handle Protolock update
+        if: steps.protolock.outputs.exit_code == '0'
+        run: |
+          echo "Protolock status OK — generating new lockfile"
+          protolock commit
+
+      - name: Commit updated protolock.json to PR branch
+        if: steps.protolock.outputs.exit_code == '0'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet protolock.json; then
+            echo "No changes in protolock.json — nothing to commit."
+            exit 0
+          fi
+
+          git add protolock.json
+          git commit -m "chore: update protolock.json"
+          git push origin HEAD:${{ github.head_ref }}
+
+      - name: Fail if breaking changes found
+        if: steps.protolock.outputs.exit_code != '0'
+        run: |
+          echo "❌ Breaking changes found in .proto!"
+          exit 1
