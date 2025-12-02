@@ -34,6 +34,11 @@
                 "id": 2,
                 "name": "status",
                 "type": "string"
+              },
+              {
+                "id": 3,
+                "name": "test",
+                "type": "string"
               }
             ]
           },
